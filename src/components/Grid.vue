@@ -58,18 +58,6 @@ export default {
       }
       return [];
     },
-    getColsCounter(index) {
-      if (index === 1) {
-        return [0, 1, 2];
-      }
-      if (index === 2) {
-        return [3, 4, 5];
-      }
-      if (index === 3) {
-        return [6, 7, 8];
-      }
-      return [];
-    },
     getRegionStart(index) {
       return Math.floor(index / 3);
     },
