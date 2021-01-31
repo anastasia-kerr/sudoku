@@ -1,12 +1,25 @@
 <template>
   <v-container>
-    <v-card width="300">
-      <v-card-text>
-        <template v-if="gridIsReady">
-          <v-row v-for="num in count" :key="num">
-            <v-chip v-for="number in grid[num]" :key="getKey(number, num)">{{
-              number
-            }}</v-chip>
+    <v-card width="390">
+      <v-card-text v-if="gridIsReady">
+        <template v-for="rowIndex in 3">
+          <v-row :key="rowIndex">
+            <v-col v-for="col in 3" :key="col">
+              <v-card hover outlined rounded>
+                <v-card-text>
+                  <v-row
+                    v-for="littlRow in getAvilablIndexesByRegionNumber(rowIndex)"
+                    :key="littlRow"
+                  >
+                    <v-chip
+                      v-for="chips in getAvilablIndexesByRegionNumber(col)"
+                      :key="chips"
+                      >{{ grid[littlRow][chips] }}
+                    </v-chip>
+                  </v-row>
+                </v-card-text>
+              </v-card>
+            </v-col>
           </v-row>
         </template>
       </v-card-text>
@@ -33,6 +46,33 @@ export default {
     this.gridIsReady = true;
   },
   methods: {
+    getAvilablIndexesByRegionNumber(index) {
+      if (index === 1) {
+        return [0, 1, 2];
+      }
+      if (index === 2) {
+        return [3, 4, 5];
+      }
+      if (index === 3) {
+        return [6, 7, 8];
+      }
+      return [];
+    },
+    getColsCounter(index) {
+      if (index === 1) {
+        return [0, 1, 2];
+      }
+      if (index === 2) {
+        return [3, 4, 5];
+      }
+      if (index === 3) {
+        return [6, 7, 8];
+      }
+      return [];
+    },
+    getRegionStart(index) {
+      return Math.floor(index / 3);
+    },
     getKey(number, index) {
       return `${this.getRandom(0, 99992)}- ${number}+${index}+${Date.now()}`;
     },
@@ -77,14 +117,6 @@ export default {
       }
       this.counter++;
     },
-    reset() {
-      let i = 0;
-      while (i < this.count) {
-        this.resetColumn(i);
-        i++;
-      }
-      this.populateGrid();
-    },
     populateGrid() {
       for (let i = 0; i < 9; i++) {
         this.populateColumn(i);
@@ -96,6 +128,13 @@ export default {
     isInTheColumn(index, item) {
       return this.grid.some((x) => x[index] === item);
     },
+    isInTheRegion(index, item) {
+      // region 1: 0..2 ;3..5;6..8
+      // const flattenedNumbers = [].concat.apply([], animals);
+
+      const regions = [];
+    },
+
     initializeGrid() {
       let i = 0;
       while (i < this.count) {
