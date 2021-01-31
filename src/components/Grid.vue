@@ -1,21 +1,23 @@
 <template>
   <v-container>
-    <v-card width="300">
+    <v-card width="390">
       <v-card-text v-if="gridIsReady">
         <template v-for="rowIndex in 3">
           <v-row :key="rowIndex">
             <v-col v-for="col in 3" :key="col">
-              <v-card>
-                <v-row
-                  v-for="littlRow in getAvilablIndexesByRegionNumber(rowIndex)"
-                  :key="littlRow"
-                >
-                  <v-chip
-                    v-for="chips in getAvilablIndexesByRegionNumber(col)"
-                    :key="chips"
-                    >{{ grid[littlRow][chips] }}
-                  </v-chip>
-                </v-row>
+              <v-card hover outlined rounded>
+                <v-card-text>
+                  <v-row
+                    v-for="littlRow in getAvilablIndexesByRegionNumber(rowIndex)"
+                    :key="littlRow"
+                  >
+                    <v-chip
+                      v-for="chips in getAvilablIndexesByRegionNumber(col)"
+                      :key="chips"
+                      >{{ grid[littlRow][chips] }}
+                    </v-chip>
+                  </v-row>
+                </v-card-text>
               </v-card>
             </v-col>
           </v-row>
