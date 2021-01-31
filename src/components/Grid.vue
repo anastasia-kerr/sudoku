@@ -35,6 +35,11 @@ export default {
       counter: 0,
       grid: [],
       count: 9,
+      regionIndex: [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+      ],
       gridIsReady: false,
     };
   },
@@ -47,19 +52,14 @@ export default {
   },
   methods: {
     getAvilablIndexesByRegionNumber(index) {
-      if (index === 1) {
-        return [0, 1, 2];
-      }
-      if (index === 2) {
-        return [3, 4, 5];
-      }
-      if (index === 3) {
-        return [6, 7, 8];
-      }
-      return [];
+      return this.regionIndex[index - 1];
     },
-    getRegionStart(index) {
-      return Math.floor(index / 3);
+    getRegion(index) {
+      for (let i = 0; i < this.regionIndex.length; i++) {
+        if (this.regionIndex[i].some((r) => r === index)) {
+          return this.regionIndex[i];
+        }
+      }
     },
     getKey(number, index) {
       return `${this.getRandom(0, 99992)}- ${number}+${index}+${Date.now()}`;
@@ -72,11 +72,19 @@ export default {
       return [...Array(numbers).keys()].slice(1);
     },
     resetColumn(index) {
+      this.getRegion(index);
       for (let i = 0; i < 8; i++) {
         let clone = [...this.grid[i]];
         clone[index] = null;
         this.$set(this.grid, i, clone);
       }
+    },
+    resetRegionCols(index) {
+      const region = this.getRegion(index);
+      for (let x of region) {
+        this.resetColumn(x);
+      }
+      this.counter = region[0];
     },
     populateColumn(index) {
       this.resetColumn(index);
@@ -86,7 +94,11 @@ export default {
       while (i < 9) {
         let indexOfNumbers = this.getRandom(0, numbers.length - 1);
         let random = numbers[indexOfNumbers];
-        if (!this.isInTheRow(i, random) && !this.isInTheColumn(index, random)) {
+        if (
+          !this.isInTheRow(i, random) &&
+          !this.isInTheColumn(index, random) &&
+          !this.isInTheRegion(i, index, random)
+        ) {
           let clone = [...this.grid[i]];
           clone[index] = random;
           this.$set(this.grid, i, clone);
@@ -98,16 +110,15 @@ export default {
         }
         if (numberOfTries >= 8) {
           numberOfTries = 0;
-          this.resetColumn(index);
+          this.resetRegionCols(index);
           numbers = this.generateArrayOfNumbers(10);
           i = 0;
         }
       }
-      this.counter++;
     },
     populateGrid() {
-      for (let i = 0; i < 9; i++) {
-        this.populateColumn(i);
+      for (this.counter; this.counter < 9; this.counter++) {
+        this.populateColumn(this.counter);
       }
     },
     isInTheRow(index, item) {
@@ -116,11 +127,15 @@ export default {
     isInTheColumn(index, item) {
       return this.grid.some((x) => x[index] === item);
     },
-    isInTheRegion(index, item) {
-      // region 1: 0..2 ;3..5;6..8
-      // const flattenedNumbers = [].concat.apply([], animals);
-
-      const regions = [];
+    isInTheRegion(xIndex, yIndex, item) {
+      for (let x of this.getRegion(xIndex)) {
+        for (let y of this.getRegion(yIndex)) {
+          if (this.grid[y][x] === item) {
+            return true;
+          }
+        }
+      }
+      return false;
     },
 
     initializeGrid() {
